@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import morgan from "morgan";
 import connectDB from "./config/db.js";
 import authRoutes from "./route/authRoute.js";
+import cors from "cors";
 
 //configure env
 dotenv.config();
@@ -27,7 +28,7 @@ app.get("/", (req, res) => {
 });
 
 //PORT
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 
 //run listen
 app.listen(PORT, () => {

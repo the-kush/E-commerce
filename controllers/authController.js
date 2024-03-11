@@ -1,5 +1,6 @@
 import userModel from "../models/userModel.js";
 import { comparePassword, hashPassword } from "./../helpers/authHelper.js";
+import jwt  from "jsonwebtoken";
 
 export const registerController = async (req, res) => {
   try {
@@ -55,4 +56,55 @@ export const registerController = async (req, res) => {
   }
 };
 
+export const loginController = async(req, res) => {
+    try {
+        const {email, password} = req.body;
+        if(!email || ! password){
+            res.status(404).json({
+                success:false,
+                msg: "Invalid email or password"
+            })
+        }
+        const user = await userModel.findOne({ email });
+        if(!user){
+            res.status(500).json({
+                success: false,
+                msg: "Email does not exists"
+            })
+        }
+        const match = await comparePassword(password, user.password);
+        if(!match){
+            res.status(200).send({
+                success:false,
+                msg: "invalid password"
+            })
+        }
+        const token = await jwt.sign({ _id:user._id }, process.env.JWT_SECRET);
+        res.status(200).json({
+            user: {
 
+            name: user.name,
+            email: user.email,
+            phone: user.phone,
+            address: user.address,
+            },
+            token,
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            success: false,
+            msg: "Error in login",
+            error
+        })
+    }
+}
+
+export const testController = async (req, res) => {
+
+    try {
+        res.send("protected route")
+    } catch (error) {
+        console.log(error);
+    }
+}
